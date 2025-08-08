@@ -1,0 +1,59 @@
+KILIMANI PROP-TECH 2025: QUICK REFERENCE GUIDE
+==============================================
+
+LEGAL REFERENCES
+================
+1. Constitution of Kenya (2010) - Articles 42, 69, 70
+2. Physical and Land Use Planning Act (PLUPA), 2019
+3. Environmental Management and Coordination Act (EMCA)
+4. Land Act (2012)
+5. National Building Code
+
+PROFESSIONAL BODIES
+===================
+1. Board of Registration of Architects and Quantity Surveyors (BORAQS)
+2. Engineers Board of Kenya (EBK)
+3. Physical Planners Registration Board (PPTEK)
+
+GOVERNMENT ENTITIES
+==================
+1. Nairobi City County Assembly
+2. Kilimani Ward (Population: 43,122, Area: 16.1 km²)
+3. Dagoretti North NG-CDF (https://dagorettinorthngcdf.go.ke/kilimani/)
+
+DATA SOURCES
+============
+1. CHIRPS Rainfall Data 2023
+2. MODIS Land Surface Temperature Data 2023
+3. Land Use Land Cover Change Data 2010-2023
+4. Building Footprints (Google Drive)
+5. Canopy Height Data (Google Drive)
+
+TECHNICAL FRAMEWORKS
+====================
+1. Machine Learning: Scikit-learn, XGBoost, CatBoost
+2. Geospatial: Rasterio, GeoPandas, Folium
+3. Validation: Cross-validation, hyperparameter tuning
+4. Metrics: MAE, MAPE, RMSE, R², Adjusted R²
+
+KEY BILL SECTIONS REFERENCED
+============================
+- Section 2: Definition of "Regularisation"
+- Section 3a: Threshold for Eligibility  
+- Section 7: Public Participation
+- Section 9: Professional Endorsement
+- Section 11: Register of Applications
+- Section 14: Exclusion of Public Land
+- Section 17: Conditional Regularisation
+- Section 18: Amnesty Clause
+- Section 19: Demolition procedures
+- Section 21: Liability
+- Section 22: Advisory Committee Composition
+
+IMMEDIATE ACTION ITEMS
+=====================
+1. Integrate zoning data into heat predictions
+2. Develop EMCA-compliant reporting tools
+3. Create professional training materials
+4. Establish community engagement protocols
+5. Implement quality assurance standards
