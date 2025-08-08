@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
-import plotly.graph_objects as go
 import geopandas as gpd
 import rasterio
 import tempfile
@@ -12,8 +10,16 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 
+# Analysis functions for Kilimani development plan and LST predictions
 def analyze_development_plan_ai(plan_data):
-    """Simulate AI analysis of development plan"""
+    """Simulate AI analysis of a development plan for heat island impact.
+    
+    Args:
+        plan_data (dict): Dictionary containing plan details like area, type, population, etc.
+    
+    Returns:
+        dict: Structured AI analysis with thermal impact, risks, and mitigation strategies.
+    """
     analysis = {
         'planSummary': {
             'totalArea': plan_data.get('area', "250 hectares"),
@@ -72,8 +78,17 @@ def analyze_development_plan_ai(plan_data):
     }
     return analysis
 
+
+@st.cache_data
 def load_lst_prediction_data(tif_file):
-    """Load and process the LST prediction GeoTIFF from Google Earth Engine"""
+    """Load and process the LST prediction GeoTIFF from Google Earth Engine.
+    
+    Args:
+        tif_file (UploadedFile): Streamlit-uploaded GeoTIFF file.
+    
+    Returns:
+        tuple: (DataFrame with LST data, bounds of the raster)
+    """
     try:
         with rasterio.open(tif_file) as src:
             lst_data = src.read(1)
@@ -103,8 +118,17 @@ def load_lst_prediction_data(tif_file):
         st.error(f"Error loading LST prediction data: {str(e)}")
         return None, None
 
+
+@st.cache_data
 def load_building_data(shp_file):
-    """Load and process the building shapefile from Google Earth Engine"""
+    """Load and process the building shapefile from Google Earth Engine.
+    
+    Args:
+        shp_file (UploadedFile): Streamlit-uploaded ZIP or SHP file.
+    
+    Returns:
+        GeoDataFrame: Processed building data with centroids and area.
+    """
     try:
         if str(shp_file.name).endswith('.zip'):
             with tempfile.TemporaryDirectory() as temp_dir:
@@ -123,6 +147,7 @@ def load_building_data(shp_file):
                 tmp_file.write(shp_file.getbuffer())
                 tmp_file.flush()
                 gdf = gpd.read_file(tmp_file.name)
+                os.unlink(tmp_file.name)  # Clean up
         
         gdf['centroid'] = gdf.geometry.centroid
         gdf['longitude'] = gdf['centroid'].x
@@ -135,11 +160,24 @@ def load_building_data(shp_file):
         st.error(f"Error loading building data: {str(e)}")
         return None
 
+
+@st.cache_data
 def process_real_data(lst_df, buildings_gdf):
-    """Process and merge real LST and building data"""
+    """Process and merge real LST and building data into a unified DataFrame.
+    
+    Args:
+        lst_df (DataFrame): LST prediction data with lat/lon.
+        buildings_gdf (GeoDataFrame): Building footprints with geometry.
+    
+    Returns:
+        DataFrame: Merged dataset with LST and urban features.
+    """
     try:
         if lst_df is None or lst_df.empty:
             return None
+        
+        # Set random seed for consistent simulation
+        np.random.seed(42)
         
         if buildings_gdf is not None and not buildings_gdf.empty:
             merged_data = []
@@ -190,8 +228,18 @@ def process_real_data(lst_df, buildings_gdf):
         st.error(f"Error processing data: {str(e)}")
         return None
 
+
+@st.cache_data
 def analyze_lst_prediction_with_ai(df, bounds=None):
-    """AI-powered analysis of LST predictions"""
+    """AI-powered analysis of LST predictions for insights and risk assessment.
+    
+    Args:
+        df (DataFrame): Processed LST and urban features.
+        bounds (rasterio.coords.BoundingBox, optional): Geographic bounds.
+    
+    Returns:
+        dict: Structured analysis with overview, risks, recommendations.
+    """
     if df is None or df.empty:
         return None
     
@@ -248,8 +296,9 @@ def analyze_lst_prediction_with_ai(df, bounds=None):
     
     return analysis
 
+
 def get_primary_concern(mean_temp, max_temp, std_temp):
-    """Determine primary concern based on temperature analysis"""
+    """Determine primary concern based on temperature analysis."""
     if max_temp > 45:
         return "Extreme heat exposure risk - Immediate intervention required in hottest areas"
     elif mean_temp > 38:
@@ -261,8 +310,9 @@ def get_primary_concern(mean_temp, max_temp, std_temp):
     else:
         return "Moderate heat conditions - Preventive measures recommended"
 
+
 def get_spatial_recommendations(hot_spots, cool_spots, df):
-    """Generate spatial recommendations based on temperature patterns"""
+    """Generate spatial recommendations based on temperature patterns."""
     recommendations = []
     
     if len(hot_spots) > len(df) * 0.2:
@@ -283,10 +333,12 @@ def get_spatial_recommendations(hot_spots, cool_spots, df):
     
     return recommendations
 
+
 def get_intervention_priority(temp_ranges):
-    """Determine intervention priorities based on temperature distribution"""
-    extreme_heat_pct = (temp_ranges['Extreme Heat (>40°C)'] / sum(temp_ranges.values())) * 100
-    high_heat_pct = (temp_ranges['High Heat (35-40°C)'] / sum(temp_ranges.values())) * 100
+    """Determine intervention priorities based on temperature distribution."""
+    total = sum(temp_ranges.values())
+    extreme_heat_pct = (temp_ranges['Extreme Heat (>40°C)'] / total) * 100
+    high_heat_pct = (temp_ranges['High Heat (35-40°C)'] / total) * 100
     
     if extreme_heat_pct > 10:
         return "Critical - Immediate emergency cooling measures required"
@@ -297,8 +349,9 @@ def get_intervention_priority(temp_ranges):
     else:
         return "Medium - Preventive cooling measures and monitoring"
 
+
 def get_climate_adaptation_needs(mean_temp, max_temp, std_temp):
-    """Assess climate adaptation requirements"""
+    """Assess climate adaptation requirements."""
     needs = []
     
     if mean_temp > 35:
@@ -319,8 +372,9 @@ def get_climate_adaptation_needs(mean_temp, max_temp, std_temp):
     
     return needs
 
+
 def generate_ai_response(question, ai_analysis, df):
-    """Generate AI-style responses to user questions about the LST predictions"""
+    """Generate AI-style responses to user questions about the LST predictions."""
     question_lower = question.lower()
     
     if any(word in question_lower for word in ['intervention', 'immediate', 'urgent', 'priority']):
